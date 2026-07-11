@@ -1,0 +1,22 @@
+# ==========================================
+# SYSTEM FIREWALL: DATA VAULT
+# ==========================================
+# The data directory and any CSV files will NEVER be pushed to GitHub.
+data/
+*.csv
+
+# ==========================================
+# PYTHON ENVIRONMENT 
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# ==========================================
+# OS & IDE CONFIGURATIONS
+# ==========================================
+.vscode/
+.DS_Store
