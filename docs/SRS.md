@@ -5,13 +5,13 @@
 **Environment:** Python CLI (Local/Offline)
 **Status:** LOCKED / BASELINE ESTABLISHED
 
----
+
 
 ## 1. System Objective
 
 To construct a highly modular, asynchronous command-line logging and analytics framework tailored exclusively for systematic retail swing trading. The architecture must enforce absolute operational discipline, strictly isolate execution logic from mathematical calculation, and persist all execution and behavioral data to a centralized flat-file CSV ledger.
 
----
+
 
 ## 2. System Architecture & Directory Blueprint
 
@@ -53,7 +53,7 @@ $CLI_LOGGER_HOME/
 * **FR-05: Computational Regime Tagging:** `regime_finder.py` must programmatically ingest price-action logic to output a string-based regime tag (e.g., `BULL_VOLATILE`). Manual subjective tagging is strictly prohibited.
 * **FR-06: Temporal Setup Analytics:** `trade_duration.py` must partition historical data by `setup_id` and compute the time delta (`exit_timestamp - entry_timestamp`). It must isolate and return the mathematical mean and median durations for winning trades (`exit_trigger == 'TP'`) and losing trades (`exit_trigger == 'SL'`).
 
----
+
 
 ## 4. Non-Functional Requirements (NFR)
 
@@ -63,7 +63,6 @@ $CLI_LOGGER_HOME/
 * **NFR-04: Data Sanitization (Free-Text):** The `storage_engine.py` must sanitize the `trade_friction_log` by stripping internal carriage returns and wrapping the payload in double quotes to prevent CSV delimiter corruption.
 * **NFR-05: File State Locking:** The system must implement cross-platform file locking (e.g., `portalocker`) during read/write operations to prevent race conditions between the CLI ingestion thread and the background analytics thread.
 
----
 
 ## 5. Data Schema (`trading_log.csv`)
 
