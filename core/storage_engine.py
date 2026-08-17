@@ -1,6 +1,7 @@
 import csv
 import os
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'trading_log.csv')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+DB_PATH = os.path.join(PROJECT_ROOT, 'data', 'trading_log.csv')
 
 def sanitize_text(text_input) -> str:
     """
@@ -76,9 +77,18 @@ def close_trade(trade_id, exit_trigger, trade_outcome, mae, mfe, friction_log):
     
     # Write the updated rows back to the CSV file
     with open(DB_PATH, mode='w', newline='') as file:
-        fieldnames = ['trade_id', 'asset', 'Set-up ID', 'HTF Bias', 'LTF Bias', 'Risk', 'Postion size', 
-                      'Entry Price', 'Stop Loss', 'Take Profit', 'MAE', 'MFE', 
-                      'Exit-Trigger', 'Trade Outcome', 'friction_Log']
+        fieldnames = ['trade_id', 'timestamp', 'asset', 'direction', 'setup_id', 'htf_bias', 'ltf_bias', 'Risk', 'position_size', 
+                      'entry_price', 'stop_loss', 'take_profit', 'MAE', 'MFE', 
+                      'exit_trigger', 'trade_outcome', 'friction_Log']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(all_rows)
+
+if __name__ == "__main__":
+    print("Initiating storage engine unit test...")
+    test_trade_data = ["test_uuid_1234", "2026-08-16 07:00:00", "EURUSD", "Long", 
+        "Setup_A", "Bull", "Bull", 0.005, 1.25, 
+        1.1000, 1.0900, 1.1200, 
+        0.0, 0.0, "", "Open", ""]
+    append_trade(test_trade_data)
+    print("Test complete. Check the trading_log.csv file in the data directory for the appended test trade.")
