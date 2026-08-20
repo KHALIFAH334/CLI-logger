@@ -11,20 +11,28 @@ def sanitize_text(text_input) -> str:
     sanitized_text = text_input.strip().replace(',', ' ').replace(':', ' ').replace('\n', ' ')
     return sanitized_text
 
+FIELDNAMES = ['trade_id', 'timestamp', 'asset', 'direction', 'setup_id', 'htf_bias', 'ltf_bias', 'Risk', 'position_size',
+              'entry_price', 'stop_loss', 'take_profit', 'MAE', 'MFE',
+              'exit_trigger', 'trade_outcome', 'friction_Log']
+
 def append_trade(trade_data_list):
     """
     Appends a new trade entry to the trading log CSV file.
     
     Parameters:
         trade_data_list (list): A list containing trade data in the following order:
-            [trade_id, asset, Set-up ID, HTF Bias, LTF Bias, Risk, Postion size, Entry Price, Stop Loss, Take Profit, MAE, MFE, Exit-Trigger, Trade Outcome, friction_Log]
+            [trade_id, timestamp, asset, direction, setup_id, htf_bias, ltf_bias, Risk, position_size, entry_price, stop_loss, take_profit, MAE, MFE, exit_trigger, trade_outcome, friction_Log]
     """
     # Ensure the directory exists
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     
+    file_exists = os.path.exists(DB_PATH) and os.path.getsize(DB_PATH) > 0
+    
     # Append the trade data to the CSV file
-    with open(DB_PATH, mode='w', newline='') as file:
+    with open(DB_PATH, mode='a', newline='') as file:
         writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(FIELDNAMES)
         writer.writerow(trade_data_list)
 
 def get_open_trades():
@@ -43,7 +51,7 @@ def get_open_trades():
     with open(DB_PATH, mode='r', newline='') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            if row['Trade Outcome'] == 'Open':
+            if row['trade_outcome'] == 'Open':
                 open_trades.append(row)
     
     return open_trades
@@ -77,10 +85,7 @@ def close_trade(trade_id, exit_trigger, trade_outcome, mae, mfe, friction_log):
     
     # Write the updated rows back to the CSV file
     with open(DB_PATH, mode='w', newline='') as file:
-        fieldnames = ['trade_id', 'timestamp', 'asset', 'direction', 'setup_id', 'htf_bias', 'ltf_bias', 'Risk', 'position_size', 
-                      'entry_price', 'stop_loss', 'take_profit', 'MAE', 'MFE', 
-                      'exit_trigger', 'trade_outcome', 'friction_Log']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
         writer.writeheader()
         writer.writerows(all_rows)
 

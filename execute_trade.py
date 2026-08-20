@@ -3,10 +3,14 @@ from datetime import datetime
 from core.risk_engine import calculate_sizing
 from core.storage_engine import append_trade
 from core.risk_engine import MAX_RISK
+from analytics.edge_calculator import calculate_edge
 
 
 asset = input("Enter the asset: ")
 setup_id = input("Enter the Set-up ID: ")
+win_rate, t100_win_rate = calculate_edge(setup_id)
+print(f"Set-up {setup_id} | All-Time: {win_rate}% | T 100 Trades: {t100_win_rate}%")
+print("-" * 40)
 direction = input("Enter the direction (Long/Short): ")
 account_balance = float(input("Enter your account balance: "))
 entry_price = float(input("Enter the entry price: "))
