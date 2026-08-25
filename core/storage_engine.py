@@ -2,6 +2,7 @@ import csv
 import os
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 DB_PATH = os.path.join(PROJECT_ROOT, 'data', 'trading_log.csv')
+ANALYSIS_DB_PATH = os.path.join(PROJECT_ROOT, 'data', 'daily_analytics.csv')
 
 def sanitize_text(text_input) -> str:
     """
@@ -11,9 +12,9 @@ def sanitize_text(text_input) -> str:
     sanitized_text = text_input.strip().replace(',', ' ').replace(':', ' ').replace('\n', ' ')
     return sanitized_text
 
-FIELDNAMES = ['trade_id', 'timestamp', 'asset', 'direction', 'setup_id', 'htf_bias', 'ltf_bias', 'Risk', 'position_size',
-              'entry_price', 'stop_loss', 'take_profit', 'MAE', 'MFE',
-              'exit_trigger', 'trade_outcome', 'friction_Log']
+FIELDNAMES = ['trade_id', 'timestamp', 'asset', 'direction', 'setup_id', 'htf_bias', 'ltf_bias', 'risk', 'position_size',
+              'entry_price', 'stop_loss', 'take_profit', 'mae', 'mfe',
+              'exit_trigger', 'trade_outcome', 'friction_log']
 
 def append_trade(trade_data_list):
     """
@@ -76,11 +77,11 @@ def close_trade(trade_id, exit_trigger, trade_outcome, mae, mfe, friction_log):
         reader = csv.DictReader(file)
         for row in reader:
             if row['trade_id'] == trade_id:
-                row['Exit-Trigger'] = exit_trigger
-                row['Trade Outcome'] = trade_outcome
-                row['MAE'] = mae
-                row['MFE'] = mfe
-                row['friction_Log'] = sanitize_text(friction_log)
+                row['exit_trigger'] = exit_trigger
+                row['trade_outcome'] = trade_outcome
+                row['mae'] = mae
+                row['mfe'] = mfe
+                row['friction_log'] = sanitize_text(friction_log)
             all_rows.append(row)
     
     # Write the updated rows back to the CSV file
@@ -89,6 +90,24 @@ def close_trade(trade_id, exit_trigger, trade_outcome, mae, mfe, friction_log):
         writer.writeheader()
         writer.writerows(all_rows)
 
+def initialize_analysis_db():
+    """
+    Initializes the daily analytics CSV file with headers if it doesn't already exist.
+    """
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(ANALYSIS_DB_PATH), exist_ok=True)
+    
+    if not os.path.exists(ANALYSIS_DB_PATH):
+        with open(ANALYSIS_DB_PATH, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['date', 'analysis_type', 'market_regime', 'bias', 'key_levels', 'notes'])
+
+def append_analysis(analysis_data: list):
+    os.makedirs(os.path.dirname(ANALYSIS_DB_PATH), exist_ok=True)
+    with open(ANALYSIS_DB_PATH, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(analysis_data)
+
 if __name__ == "__main__":
     print("Initiating storage engine unit test...")
     test_trade_data = ["test_uuid_1234", "2026-08-16 07:00:00", "EURUSD", "Long", 
@@ -96,4 +115,5 @@ if __name__ == "__main__":
         1.1000, 1.0900, 1.1200, 
         0.0, 0.0, "", "Open", ""]
     append_trade(test_trade_data)
+    initialize_analysis_db()
     print("Test complete. Check the trading_log.csv file in the data directory for the appended test trade.")
